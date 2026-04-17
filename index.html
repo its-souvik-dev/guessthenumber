@@ -9,7 +9,7 @@
         body { font-family: 'Segoe UI', sans-serif; background: #121212; color: #fff; display: flex; flex-direction: column; align-items: center; padding: 15px; text-align: center; margin: 0; touch-action: manipulation; }
         h1 { color: #4CAF50; margin-bottom: 10px; font-size: 1.8rem; }
         
-        .panel { background: #1e1e1e; padding: 20px; border-radius: 12px; width: 100%; max-width: 400px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        .panel { background: #1e1e1e; padding: 20px; border-radius: 12px; width: 100%; max-width: 400px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); box-sizing: border-box; }
         input[type="text"], input[type="number"] { padding: 12px; font-size: 1.2rem; width: 100%; margin-bottom: 15px; border-radius: 8px; border: 2px solid #333; background: #222; color: #fff; text-align: center; text-transform: uppercase; box-sizing: border-box; }
         
         button { background-color: #4CAF50; color: white; border: none; padding: 15px; font-size: 1.2rem; border-radius: 8px; cursor: pointer; width: 100%; font-weight: bold; transition: 0.2s; margin-bottom: 15px; }
@@ -20,21 +20,26 @@
         /* Game States */
         #setup-panel, #game-panel { display: none; width: 100%; max-width: 400px; }
         
-        #status-msg { font-size: 1.1rem; font-weight: bold; min-height: 25px; margin-bottom: 15px; padding: 10px; border-radius: 8px; background: #222; color: #FFC107; }
+        #status-msg { font-size: 1.1rem; font-weight: bold; min-height: 25px; margin-bottom: 10px; padding: 10px; border-radius: 8px; background: #222; color: #FFC107; }
 
-        /* The Guess Stack */
-        .stack-container { background: #1a1a1a; border-radius: 8px; padding: 10px; margin-bottom: 15px; border: 1px solid #333; }
-        h3 { margin: 0 0 10px 0; color: #aaa; font-size: 1rem; border-bottom: 1px solid #333; padding-bottom: 5px; }
+        .secret-banner { background: #2196F3; padding: 10px; border-radius: 8px; margin-bottom: 15px; font-weight: bold; font-size: 1.1rem; }
+        #my-secret-display { color: #fff; font-size: 1.5rem; background: rgba(0,0,0,0.2); padding: 2px 10px; border-radius: 6px; margin-left: 5px; }
+
+        /* The Dual Stack Area */
+        .stacks-wrapper { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
+        .stack-container { background: #1a1a1a; border-radius: 8px; padding: 10px; border: 1px solid #333; display: flex; flex-direction: column; }
+        h3 { margin: 0 0 10px 0; color: #aaa; font-size: 0.9rem; border-bottom: 1px solid #333; padding-bottom: 5px; }
         
-        #guess-stack { max-height: 200px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding-right: 5px; }
+        .guess-stack { height: 180px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding-right: 5px; }
         
-        .guess-item { padding: 10px; border-radius: 6px; font-weight: bold; font-size: 1.1rem; display: flex; justify-content: space-between; align-items: center; animation: popIn 0.3s ease; }
+        /* Stack Items - Stacked vertically for narrow mobile columns */
+        .guess-item { padding: 8px; border-radius: 6px; font-weight: bold; font-size: 0.95rem; display: flex; flex-direction: column; align-items: center; justify-content: center; animation: popIn 0.3s ease; }
+        .guess-item span:first-child { font-size: 1.2rem; margin-bottom: 2px; }
         
         /* Colors for the stack */
         .guess-high { background-color: rgba(244, 67, 54, 0.2); border: 1px solid #F44336; color: #ff8a80; } /* RED */
         .guess-low { background-color: rgba(33, 150, 243, 0.2); border: 1px solid #2196F3; color: #80d8ff; } /* BLUE */
         .guess-correct { background-color: rgba(76, 175, 80, 0.2); border: 1px solid #4CAF50; color: #b9f6ca; } /* GREEN */
-        .guess-opp { background-color: rgba(255, 255, 255, 0.1); border: 1px solid #555; color: #ccc; } /* GREY for opponent */
 
         @keyframes popIn { 0% { opacity: 0; transform: translateY(-10px); } 100% { opacity: 1; transform: translateY(0); } }
 
@@ -54,8 +59,8 @@
     </div>
 
     <div class="panel" id="setup-panel">
-        <div style="background: #2196F3; padding: 8px; border-radius: 8px; margin-bottom: 15px; font-weight: bold;">
-            Room: <span id="room-display" style="letter-spacing: 2px;">---</span>
+        <div style="background: #333; padding: 8px; border-radius: 8px; margin-bottom: 15px; font-weight: bold; color: #aaa;">
+            Room: <span id="room-display" style="letter-spacing: 2px; color: #fff;">---</span>
         </div>
         <h2 style="margin-top: 0;">Pick Your Secret</h2>
         <p style="color: #aaa; font-size: 0.9rem; margin-bottom: 15px;">Choose a number between 1 and 100.</p>
@@ -65,16 +70,28 @@
     </div>
 
     <div id="game-panel">
-        <div id="status-msg">Game Starting...</div>
-
-        <div class="stack-container">
-            <h3>Your Guess History</h3>
-            <div id="guess-stack">
-                </div>
+        
+        <div class="secret-banner">
+            My Secret is: <span id="my-secret-display">?</span>
         </div>
 
-        <div class="panel" style="padding: 15px;">
-            <input type="number" id="guess-input" placeholder="Enter Guess (1-100)" min="1" max="100">
+        <div id="status-msg">Game Starting...</div>
+
+        <div class="stacks-wrapper">
+            <div class="stack-container">
+                <h3>MY GUESSES</h3>
+                <div id="my-guess-stack" class="guess-stack">
+                    </div>
+            </div>
+            <div class="stack-container">
+                <h3>THEIR GUESSES</h3>
+                <div id="opp-guess-stack" class="guess-stack">
+                    </div>
+            </div>
+        </div>
+
+        <div class="panel" style="padding: 15px; box-sizing: border-box;">
+            <input type="number" id="guess-input" placeholder="Your Guess (1-100)" min="1" max="100">
             <button id="guess-btn" onclick="sendGuess()">Submit Guess</button>
         </div>
 
@@ -101,9 +118,11 @@
             roomDisp: document.getElementById('room-display'),
             secretInput: document.getElementById('secret-input'),
             lockBtn: document.getElementById('lock-btn'),
+            mySecretDisp: document.getElementById('my-secret-display'), // New
             guessInput: document.getElementById('guess-input'),
             guessBtn: document.getElementById('guess-btn'),
-            guessStack: document.getElementById('guess-stack'),
+            myGuessStack: document.getElementById('my-guess-stack'), // New
+            oppGuessStack: document.getElementById('opp-guess-stack'), // New
             restartBtn: document.getElementById('restart-btn')
         };
 
@@ -182,6 +201,8 @@
             if (isNaN(val) || val < 1 || val > 100) return alert("Enter a number between 1 and 100.");
             
             mySecret = val;
+            ui.mySecretDisp.innerText = mySecret; // Update the banner
+            
             ui.lockBtn.disabled = true;
             ui.secretInput.disabled = true;
             ui.setupStatus.innerText = "Secret locked! Waiting for opponent...";
@@ -226,12 +247,14 @@
             // Tell them the result
             conn.send({ type: 'RESULT', guess: guess, status: status });
 
-            // Show their guess in our stack (just for info)
-            addToStack(guess, 'OPPONENT', 'guess-opp');
+            // Show their guess in the right-side stack
+            let text = status === 'HIGH' ? 'TOO HIGH 🔴' : status === 'LOW' ? 'TOO LOW 🔵' : 'CORRECT! 🟢';
+            let css = status === 'HIGH' ? 'guess-high' : status === 'LOW' ? 'guess-low' : 'guess-correct';
+            addToStack(ui.oppGuessStack, guess, text, css);
 
             if (status === 'CORRECT') {
                 gameActive = false;
-                ui.status.innerText = `💥 THEY GUESSED IT! Your secret was ${mySecret}. YOU LOSE!`;
+                ui.status.innerText = `💥 THEY GUESSED IT! YOU LOSE!`;
                 ui.status.style.color = "#F44336";
                 ui.restartBtn.style.display = 'block';
             } else {
@@ -242,12 +265,13 @@
 
         // When opponent tells us the result of our guess
         function handleGuessResult(guess, status) {
-            if (status === 'HIGH') {
-                addToStack(guess, 'TOO HIGH 🔴', 'guess-high');
-            } else if (status === 'LOW') {
-                addToStack(guess, 'TOO LOW 🔵', 'guess-low');
-            } else if (status === 'CORRECT') {
-                addToStack(guess, 'CORRECT! 🟢', 'guess-correct');
+            let text = status === 'HIGH' ? 'TOO HIGH 🔴' : status === 'LOW' ? 'TOO LOW 🔵' : 'CORRECT! 🟢';
+            let css = status === 'HIGH' ? 'guess-high' : status === 'LOW' ? 'guess-low' : 'guess-correct';
+            
+            // Show our guess in the left-side stack
+            addToStack(ui.myGuessStack, guess, text, css);
+
+            if (status === 'CORRECT') {
                 gameActive = false;
                 ui.status.innerText = `🎉 YOU GOT IT! Their secret was ${guess}. YOU WIN!`;
                 ui.status.style.color = "#4CAF50";
@@ -255,15 +279,15 @@
             }
         }
 
-        function addToStack(number, text, cssClass) {
+        function addToStack(stackElement, number, text, cssClass) {
             const item = document.createElement('div');
             item.className = `guess-item ${cssClass}`;
             
-            // Layout: [Number] --------- [Result]
-            item.innerHTML = `<span>Number: ${number}</span> <span>${text}</span>`;
+            // Changed layout so it stacks nicely in the narrow column
+            item.innerHTML = `<span>${number}</span> <span>${text}</span>`;
             
-            // Insert at the top of the stack
-            ui.guessStack.insertBefore(item, ui.guessStack.firstChild);
+            // Insert at the top of the specific stack
+            stackElement.insertBefore(item, stackElement.firstChild);
         }
 
         function updateTurnUI() {
@@ -293,10 +317,13 @@
             oppReady = false;
             gameActive = false;
             
-            // Loser goes first next game (if Host won, isHost is true, so joiner goes first)
             isHost = !isHost; 
 
-            ui.guessStack.innerHTML = '';
+            // Clear both stacks
+            ui.myGuessStack.innerHTML = '';
+            ui.oppGuessStack.innerHTML = '';
+            
+            ui.mySecretDisp.innerText = '?';
             ui.secretInput.value = '';
             ui.secretInput.disabled = false;
             ui.lockBtn.disabled = false;
