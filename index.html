@@ -17,29 +17,31 @@
         button:disabled { background-color: #555; color: #888; cursor: not-allowed; transform: none; }
         .btn-blue { background-color: #2196F3; }
         
-        /* Game States */
         #setup-panel, #game-panel { display: none; width: 100%; max-width: 400px; }
         
         #status-msg { font-size: 1.1rem; font-weight: bold; min-height: 25px; margin-bottom: 10px; padding: 10px; border-radius: 8px; background: #222; color: #FFC107; }
 
         .secret-banner { background: #2196F3; padding: 10px; border-radius: 8px; margin-bottom: 15px; font-weight: bold; font-size: 1.1rem; }
-        #my-secret-display { color: #fff; font-size: 1.5rem; background: rgba(0,0,0,0.2); padding: 2px 10px; border-radius: 6px; margin-left: 5px; }
+        #my-secret-display { color: #fff; font-size: 1.5rem; background: rgba(0,0,0,0.2); padding: 2px 10px; border-radius: 6px; margin-left: 5px; letter-spacing: 2px; }
 
-        /* The Dual Stack Area */
         .stacks-wrapper { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
-        .stack-container { background: #1a1a1a; border-radius: 8px; padding: 10px; border: 1px solid #333; display: flex; flex-direction: column; }
-        h3 { margin: 0 0 10px 0; color: #aaa; font-size: 0.9rem; border-bottom: 1px solid #333; padding-bottom: 5px; }
+        .stack-container { background: #1a1a1a; border-radius: 8px; padding: 8px; border: 1px solid #333; display: flex; flex-direction: column; }
+        h3 { margin: 0 0 10px 0; color: #aaa; font-size: 0.85rem; border-bottom: 1px solid #333; padding-bottom: 5px; text-transform: uppercase; }
         
-        .guess-stack { height: 180px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding-right: 5px; }
+        .guess-stack { height: 220px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding-right: 5px; }
         
-        /* Stack Items - Stacked vertically for narrow mobile columns */
-        .guess-item { padding: 8px; border-radius: 6px; font-weight: bold; font-size: 0.95rem; display: flex; flex-direction: column; align-items: center; justify-content: center; animation: popIn 0.3s ease; }
-        .guess-item span:first-child { font-size: 1.2rem; margin-bottom: 2px; }
+        .guess-item { padding: 8px; border-radius: 6px; font-weight: bold; font-size: 0.95rem; display: flex; flex-direction: column; align-items: center; justify-content: center; animation: popIn 0.3s ease; background-color: rgba(255, 255, 255, 0.05); border: 1px solid #444; }
+        .guess-item .guess-number { font-size: 1.1rem; margin-bottom: 4px; color: #fff; }
         
-        /* Colors for the stack */
-        .guess-high { background-color: rgba(244, 67, 54, 0.2); border: 1px solid #F44336; color: #ff8a80; } /* RED */
-        .guess-low { background-color: rgba(33, 150, 243, 0.2); border: 1px solid #2196F3; color: #80d8ff; } /* BLUE */
-        .guess-correct { background-color: rgba(76, 175, 80, 0.2); border: 1px solid #4CAF50; color: #b9f6ca; } /* GREEN */
+        /* Digit Boxes for 3-4 digit guesses */
+        .digit-box { display: inline-block; padding: 4px 6px; margin: 0 2px; border-radius: 4px; font-size: 1.1rem; font-weight: bold; color: #fff; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); }
+        .digit-green { background-color: #4CAF50; border: 1px solid #2E7D32; }
+        .digit-red { background-color: #F44336; border: 1px solid #C62828; }
+        
+        /* High/Low colors */
+        .text-high { color: #ff8a80; background: rgba(244,67,54,0.2); padding: 2px 8px; border-radius: 4px; }
+        .text-low { color: #80d8ff; background: rgba(33,150,243,0.2); padding: 2px 8px; border-radius: 4px; }
+        .text-correct { color: #b9f6ca; background: rgba(76,175,80,0.2); padding: 2px 8px; border-radius: 4px; }
 
         @keyframes popIn { 0% { opacity: 0; transform: translateY(-10px); } 100% { opacity: 1; transform: translateY(0); } }
 
@@ -48,7 +50,7 @@
 </head>
 <body>
 
-    <h1>Secret Number VS</h1>
+    <h1>Secret Code VS</h1>
 
     <div class="panel" id="lobby-panel">
         <button onclick="createRoom()">Create Room (Host)</button>
@@ -62,17 +64,16 @@
         <div style="background: #333; padding: 8px; border-radius: 8px; margin-bottom: 15px; font-weight: bold; color: #aaa;">
             Room: <span id="room-display" style="letter-spacing: 2px; color: #fff;">---</span>
         </div>
-        <h2 style="margin-top: 0;">Pick Your Secret</h2>
-        <p style="color: #aaa; font-size: 0.9rem; margin-bottom: 15px;">Choose a number between 1 and 100.</p>
-        <input type="number" id="secret-input" placeholder="e.g. 42" min="1" max="100">
-        <button id="lock-btn" onclick="lockSecret()">Lock In Number</button>
+        <h2 style="margin-top: 0;">Pick Your Code</h2>
+        <p style="color: #aaa; font-size: 0.9rem; margin-bottom: 15px;">Choose a number from 1 to 9999.</p>
+        <input type="number" id="secret-input" placeholder="e.g. 4256" min="1" max="9999">
+        <button id="lock-btn" onclick="lockSecret()">Lock In Code</button>
         <p id="setup-status" style="color: #FFC107; font-weight: bold;"></p>
     </div>
 
     <div id="game-panel">
-        
         <div class="secret-banner">
-            My Secret is: <span id="my-secret-display">?</span>
+            My Code: <span id="my-secret-display">?</span>
         </div>
 
         <div id="status-msg">Game Starting...</div>
@@ -80,18 +81,16 @@
         <div class="stacks-wrapper">
             <div class="stack-container">
                 <h3>MY GUESSES</h3>
-                <div id="my-guess-stack" class="guess-stack">
-                    </div>
+                <div id="my-guess-stack" class="guess-stack"></div>
             </div>
             <div class="stack-container">
                 <h3>THEIR GUESSES</h3>
-                <div id="opp-guess-stack" class="guess-stack">
-                    </div>
+                <div id="opp-guess-stack" class="guess-stack"></div>
             </div>
         </div>
 
         <div class="panel" style="padding: 15px; box-sizing: border-box;">
-            <input type="number" id="guess-input" placeholder="Your Guess (1-100)" min="1" max="100">
+            <input type="number" id="guess-input" placeholder="Guess (1-9999)" min="1" max="9999">
             <button id="guess-btn" onclick="sendGuess()">Submit Guess</button>
         </div>
 
@@ -102,7 +101,6 @@
         let peer = null; let conn = null;
         let isHost = false; 
         
-        // Game Variables
         let mySecret = null;
         let oppReady = false;
         let isMyTurn = false;
@@ -118,11 +116,11 @@
             roomDisp: document.getElementById('room-display'),
             secretInput: document.getElementById('secret-input'),
             lockBtn: document.getElementById('lock-btn'),
-            mySecretDisp: document.getElementById('my-secret-display'), // New
+            mySecretDisp: document.getElementById('my-secret-display'),
             guessInput: document.getElementById('guess-input'),
             guessBtn: document.getElementById('guess-btn'),
-            myGuessStack: document.getElementById('my-guess-stack'), // New
-            oppGuessStack: document.getElementById('opp-guess-stack'), // New
+            myGuessStack: document.getElementById('my-guess-stack'),
+            oppGuessStack: document.getElementById('opp-guess-stack'),
             restartBtn: document.getElementById('restart-btn')
         };
 
@@ -138,74 +136,53 @@
             ui.lobbyMsg.innerText = "Creating room...";
             const roomCode = generateCode();
             peer = new Peer('guess-' + roomCode); 
-
             peer.on('open', () => {
-                ui.lobby.style.display = 'none'; 
-                ui.setup.style.display = 'block';
+                ui.lobby.style.display = 'none'; ui.setup.style.display = 'block';
                 ui.roomDisp.innerText = roomCode;
-                ui.setupStatus.innerText = "Waiting for friend to join...";
+                ui.setupStatus.innerText = "Waiting for friend...";
             });
-
             peer.on('connection', (connection) => {
                 conn = connection; setupConnection();
-                ui.setupStatus.innerText = "Friend joined! Lock in your number.";
+                ui.setupStatus.innerText = "Friend joined! Lock code.";
             });
         }
 
         function joinRoom() {
             const code = document.getElementById('room-code').value.toUpperCase();
             if(code.length !== 4) return alert("Enter 4-letter code!");
-            
-            isHost = false;
-            ui.lobbyMsg.innerText = "Connecting...";
+            isHost = false; ui.lobbyMsg.innerText = "Connecting...";
             peer = new Peer();
-            
             peer.on('open', () => {
                 conn = peer.connect('guess-' + code);
                 conn.on('open', () => {
-                    ui.lobby.style.display = 'none'; 
-                    ui.setup.style.display = 'block';
+                    ui.lobby.style.display = 'none'; ui.setup.style.display = 'block';
                     ui.roomDisp.innerText = code;
-                    ui.setupStatus.innerText = "Connected! Lock in your number.";
+                    ui.setupStatus.innerText = "Connected! Lock code.";
                     setupConnection();
                 });
             });
-            peer.on('error', () => { ui.lobbyMsg.innerText = "Room not found!"; });
         }
 
         // --- GAME LOGIC ---
         function setupConnection() {
             conn.on('data', (data) => {
-                if (data.type === 'READY') {
-                    oppReady = true;
-                    checkStartGame();
-                } 
-                else if (data.type === 'GUESS') {
-                    handleOpponentGuess(data.val);
-                }
-                else if (data.type === 'RESULT') {
-                    handleGuessResult(data.guess, data.status);
-                }
-                else if (data.type === 'RESTART') {
-                    resetGame();
-                }
+                if (data.type === 'READY') { oppReady = true; checkStartGame(); } 
+                else if (data.type === 'GUESS') { handleOpponentGuess(data.val); }
+                else if (data.type === 'RESULT') { handleGuessResult(data); }
+                else if (data.type === 'RESTART') { resetGame(); }
             });
-            conn.on('close', () => { 
-                ui.status.innerText = "Opponent disconnected!"; 
-                ui.guessBtn.disabled = true;
-            });
+            conn.on('close', () => { ui.status.innerText = "Opponent disconnected!"; ui.guessBtn.disabled = true; });
         }
 
         function lockSecret() {
             const val = parseInt(ui.secretInput.value);
-            if (isNaN(val) || val < 1 || val > 100) return alert("Enter a number between 1 and 100.");
+            if (isNaN(val) || val < 1 || val > 9999) return alert("Enter a number between 1 and 9999.");
             
             mySecret = val;
-            ui.mySecretDisp.innerText = mySecret; // Update the banner
+            ui.mySecretDisp.innerText = mySecret.toString().padStart(4, '0'); 
             
-            ui.lockBtn.disabled = true;
-            ui.secretInput.disabled = true;
-            ui.setupStatus.innerText = "Secret locked! Waiting for opponent...";
+            ui.lockBtn.disabled = true; ui.secretInput.disabled = true;
+            ui.setupStatus.innerText = "Locked! Waiting for opponent...";
             
             conn.send({ type: 'READY' });
             checkStartGame();
@@ -213,11 +190,8 @@
 
         function checkStartGame() {
             if (mySecret !== null && oppReady) {
-                ui.setup.style.display = 'none';
-                ui.game.style.display = 'block';
+                ui.setup.style.display = 'none'; ui.game.style.display = 'block';
                 gameActive = true;
-                
-                // Host goes first
                 isMyTurn = isHost;
                 updateTurnUI();
             }
@@ -225,113 +199,105 @@
 
         function sendGuess() {
             if (!isMyTurn || !gameActive) return;
-            
             const val = parseInt(ui.guessInput.value);
-            if (isNaN(val) || val < 1 || val > 100) return alert("Guess between 1 and 100.");
+            if (isNaN(val) || val < 1 || val > 9999) return alert("Guess between 1 and 9999.");
 
             ui.guessInput.value = '';
-            isMyTurn = false;
-            updateTurnUI();
+            isMyTurn = false; updateTurnUI();
             
-            // Send guess to opponent to check
             conn.send({ type: 'GUESS', val: val });
         }
 
-        // When opponent sends us a guess, we check it against our secret
-        function handleOpponentGuess(guess) {
-            let status = '';
-            if (guess > mySecret) status = 'HIGH';
-            else if (guess < mySecret) status = 'LOW';
-            else status = 'CORRECT';
+        // When opponent sends a guess, check it against our secret
+        function handleOpponentGuess(guessNum) {
+            let isWin = (guessNum === mySecret);
+            let resultData = { type: 'RESULT', guess: guessNum, isWin: isWin, displayHtml: "" };
 
-            // Tell them the result
-            conn.send({ type: 'RESULT', guess: guess, status: status });
+            if (isWin) {
+                resultData.displayHtml = `<span class="text-correct">CORRECT! 🟢</span>`;
+            } 
+            else if (guessNum < 100) {
+                // RULE 1: 1 or 2 digit guesses (High/Low Mode)
+                if (guessNum > mySecret) resultData.displayHtml = `<span class="text-high">TOO HIGH 🔴</span>`;
+                else resultData.displayHtml = `<span class="text-low">TOO LOW 🔵</span>`;
+            } 
+            else {
+                // RULE 2: 3 or 4 digit guesses (Digit Scanner Mode)
+                // We pad both numbers to 4 digits to align them perfectly
+                let gStr = guessNum.toString().padStart(4, '0');
+                let sStr = mySecret.toString().padStart(4, '0');
+                let html = "<div>";
+                
+                for(let i = 0; i < 4; i++) {
+                    if (gStr[i] === sStr[i]) {
+                        html += `<span class="digit-box digit-green">${gStr[i]}</span>`;
+                    } else {
+                        html += `<span class="digit-box digit-red">${gStr[i]}</span>`;
+                    }
+                }
+                html += "</div>";
+                resultData.displayHtml = html;
+            }
 
-            // Show their guess in the right-side stack
-            let text = status === 'HIGH' ? 'TOO HIGH 🔴' : status === 'LOW' ? 'TOO LOW 🔵' : 'CORRECT! 🟢';
-            let css = status === 'HIGH' ? 'guess-high' : status === 'LOW' ? 'guess-low' : 'guess-correct';
-            addToStack(ui.oppGuessStack, guess, text, css);
+            conn.send(resultData);
 
-            if (status === 'CORRECT') {
+            // Show their guess in our right-side stack
+            addToStack(ui.oppGuessStack, guessNum, resultData.displayHtml);
+
+            if (isWin) {
                 gameActive = false;
                 ui.status.innerText = `💥 THEY GUESSED IT! YOU LOSE!`;
                 ui.status.style.color = "#F44336";
                 ui.restartBtn.style.display = 'block';
             } else {
-                isMyTurn = true;
-                updateTurnUI();
+                isMyTurn = true; updateTurnUI();
             }
         }
 
-        // When opponent tells us the result of our guess
-        function handleGuessResult(guess, status) {
-            let text = status === 'HIGH' ? 'TOO HIGH 🔴' : status === 'LOW' ? 'TOO LOW 🔵' : 'CORRECT! 🟢';
-            let css = status === 'HIGH' ? 'guess-high' : status === 'LOW' ? 'guess-low' : 'guess-correct';
-            
-            // Show our guess in the left-side stack
-            addToStack(ui.myGuessStack, guess, text, css);
+        // When opponent sends the result of our guess back to us
+        function handleGuessResult(data) {
+            // Show in our left-side stack
+            addToStack(ui.myGuessStack, data.guess, data.displayHtml);
 
-            if (status === 'CORRECT') {
+            if (data.isWin) {
                 gameActive = false;
-                ui.status.innerText = `🎉 YOU GOT IT! Their secret was ${guess}. YOU WIN!`;
+                ui.status.innerText = `🎉 YOU GOT IT! YOU WIN!`;
                 ui.status.style.color = "#4CAF50";
                 ui.restartBtn.style.display = 'block';
             }
         }
 
-        function addToStack(stackElement, number, text, cssClass) {
+        function addToStack(stackElement, number, htmlContent) {
             const item = document.createElement('div');
-            item.className = `guess-item ${cssClass}`;
+            item.className = 'guess-item';
             
-            // Changed layout so it stacks nicely in the narrow column
-            item.innerHTML = `<span>${number}</span> <span>${text}</span>`;
+            // Format: Number on top, Result on bottom
+            item.innerHTML = `<span class="guess-number">${number}</span> ${htmlContent}`;
             
-            // Insert at the top of the specific stack
             stackElement.insertBefore(item, stackElement.firstChild);
         }
 
         function updateTurnUI() {
-            if (!gameActive) {
-                ui.guessBtn.disabled = true;
-                return;
-            }
+            if (!gameActive) { ui.guessBtn.disabled = true; return; }
             if (isMyTurn) {
                 ui.status.innerText = "YOUR TURN! Enter a guess.";
-                ui.status.style.color = "#4CAF50";
-                ui.guessBtn.disabled = false;
+                ui.status.style.color = "#4CAF50"; ui.guessBtn.disabled = false;
             } else {
                 ui.status.innerText = "Opponent is thinking...";
-                ui.status.style.color = "#aaa";
-                ui.guessBtn.disabled = true;
+                ui.status.style.color = "#aaa"; ui.guessBtn.disabled = true;
             }
         }
 
-        // --- RESTART LOGIC ---
-        function triggerRestart() {
-            conn.send({ type: 'RESTART' });
-            resetGame();
-        }
+        function triggerRestart() { conn.send({ type: 'RESTART' }); resetGame(); }
 
         function resetGame() {
-            mySecret = null;
-            oppReady = false;
-            gameActive = false;
-            
-            isHost = !isHost; 
-
-            // Clear both stacks
-            ui.myGuessStack.innerHTML = '';
-            ui.oppGuessStack.innerHTML = '';
-            
-            ui.mySecretDisp.innerText = '?';
-            ui.secretInput.value = '';
-            ui.secretInput.disabled = false;
-            ui.lockBtn.disabled = false;
-            ui.restartBtn.style.display = 'none';
-            
-            ui.game.style.display = 'none';
+            mySecret = null; oppReady = false; gameActive = false; isHost = !isHost; 
+            ui.myGuessStack.innerHTML = ''; ui.oppGuessStack.innerHTML = '';
+            ui.mySecretDisp.innerText = '?'; ui.secretInput.value = '';
+            ui.secretInput.disabled = false; ui.lockBtn.disabled = false;
+            ui.restartBtn.style.display = 'none'; ui.game.style.display = 'none';
             ui.setup.style.display = 'block';
-            ui.setupStatus.innerText = "New Match! Lock in your new secret number.";
+            ui.setupStatus.innerText = "New Match! Lock your new code.";
         }
     </script>
 </body>
